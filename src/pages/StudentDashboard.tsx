@@ -1,5 +1,4 @@
 import React from "react";
-import Layout from "../components/Layout";
 
 const StudentDashboard: React.FC = () => {
     const courses = [
@@ -8,7 +7,7 @@ const StudentDashboard: React.FC = () => {
     ];
 
     return (
-        <Layout>
+        <>
             <h1 className="text-3xl font-bold mb-4">Panel del Estudiante</h1>
             <div className="bg-white p-4 rounded shadow">
                 <h2 className="text-xl font-bold mb-2">Mis Cursos</h2>
@@ -24,7 +23,7 @@ const StudentDashboard: React.FC = () => {
                     ))}
                 </ul>
             </div>
-        </Layout>
+        </>
     );
 };
 

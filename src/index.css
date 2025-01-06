@@ -5,3 +5,7 @@
 body {
   @apply bg-neutral text-dark font-sans;
 }
+
+.swal2-popup {
+  font-family: 'Poppins', sans-serif;
+}
