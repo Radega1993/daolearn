@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import apiClient from "../api/axios";
-import { decodeToken } from "../utils/jwt"; // Crea esta función para decodificar el token
+import { decodeToken, isTokenExpired } from "../utils/jwt";
 
 interface User {
     id: number;
@@ -12,6 +12,7 @@ interface AuthContextProps {
     user: User | null;
     isAuthenticated: boolean;
     login: (email: string, password: string) => Promise<void>;
+    register: (email: string, password: string, role: string) => Promise<void>;
     logout: () => void;
 }
 
@@ -22,22 +23,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        if (token) {
+        if (token && !isTokenExpired(token)) {
             const decoded = decodeToken(token);
-            setUser(decoded); // Decodifica el token para obtener los datos del usuario
+            setUser(decoded);
+        } else {
+            localStorage.removeItem("token");
         }
     }, []);
 
     const login = async (email: string, password: string) => {
-        try {
-            const response = await apiClient.post("/auth/login", { email, password });
-            const { token, user: userData } = response.data;
+        const response = await apiClient.post("/auth/login", { email, password });
+        const { token, user: userData } = response.data;
 
-            localStorage.setItem("token", token);
-            setUser(userData);
-        } catch (err) {
-            throw new Error("Error al iniciar sesión");
-        }
+        localStorage.setItem("token", token);
+        setUser(userData);
+    };
+
+    const register = async (email: string, password: string, role: string) => {
+        const response = await apiClient.post("/auth/register", { email, password, role });
+        const { token, user: userData } = response.data;
+
+        localStorage.setItem("token", token);
+        setUser(userData);
     };
 
     const logout = () => {
@@ -51,6 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 user,
                 isAuthenticated: !!user,
                 login,
+                register,
                 logout,
             }}
         >

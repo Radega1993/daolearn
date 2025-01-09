@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { useAuth } from "../hooks/useAuth";
+import React, { useEffect, useState } from "react";
+import { useAuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { showSuccessAlert, showErrorAlert } from "../components/Alert";
 
 const Login: React.FC = () => {
-    const { login, loading } = useAuth();
+    const { login, user, isAuthenticated } = useAuthContext();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
@@ -12,13 +12,18 @@ const Login: React.FC = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const user = await login(email, password);
+            await login(email, password);
             showSuccessAlert("Inicio de Sesión Exitoso", "Redirigiendo...");
-            navigate(user.role === "Instructor" ? "/instructor" : "/student");
-        } catch {
+        } catch (err) {
             showErrorAlert("Error en el Inicio de Sesión", "Intenta nuevamente.");
         }
     };
+
+    useEffect(() => {
+        if (isAuthenticated && user) {
+            navigate(user.role === "Instructor" ? "/instructor" : "/student");
+        }
+    }, [isAuthenticated, user, navigate]);
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -47,9 +52,8 @@ const Login: React.FC = () => {
                 <button
                     type="submit"
                     className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-                    disabled={loading}
                 >
-                    {loading ? "Cargando..." : "Iniciar Sesión"}
+                    Iniciar Sesión
                 </button>
             </form>
         </div>

@@ -4,7 +4,7 @@ import { useAuthContext } from "../context/AuthContext";
 
 interface PrivateRouteProps {
     children: JSX.Element;
-    roles?: string[]; // Roles permitidos, si aplica
+    roles?: string[];
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, roles }) => {

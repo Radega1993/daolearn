@@ -12,11 +12,11 @@ const Navbar: React.FC = () => {
                     <Link to="/">DaoLearn</Link>
                 </h1>
                 <ul className="flex space-x-4">
-                    <li>
-                        <Link to="/" className="hover:text-secondary">Inicio</Link>
-                    </li>
                     {!isAuthenticated ? (
                         <>
+                            <li>
+                                <Link to="/" className="hover:text-secondary">Inicio</Link>
+                            </li>
                             <li>
                                 <Link to="/login" className="hover:text-secondary">Login</Link>
                             </li>
