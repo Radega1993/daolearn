@@ -1,5 +1,5 @@
 import axios from "axios";
-import { decodeToken, isTokenExpired } from "../utils/jwt";
+import { isTokenExpired } from "../utils/jwt";
 
 const apiClient = axios.create({
     baseURL: "http://localhost:3000", // Cambiar a la URL del backend
@@ -14,23 +14,16 @@ apiClient.interceptors.request.use(async (config) => {
 
     if (token) {
         if (isTokenExpired(token)) {
-            try {
-                const response = await axios.post("http://localhost:3000/auth/refresh-token", {
-                    token,
-                });
-                const { newToken } = response.data;
-                localStorage.setItem("token", newToken);
-                config.headers.Authorization = `Bearer ${newToken}`;
-            } catch (err) {
-                console.error("Error al refrescar el token:", err);
-                localStorage.removeItem("token");
-            }
+            console.error("El token ha expirado, debes iniciar sesión nuevamente.");
+            localStorage.removeItem("token");
         } else {
             config.headers.Authorization = `Bearer ${token}`;
         }
     }
 
     return config;
+}, (error) => {
+    return Promise.reject(error);
 });
 
 export default apiClient;

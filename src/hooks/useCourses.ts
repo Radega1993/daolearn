@@ -1,33 +1,35 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import apiClient from "../api/axios";
+import { Course } from "../types/Course";
 
 export const useCourses = () => {
-    const [courses, setCourses] = useState([]);
+    const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchCourses = async () => {
+    const fetchCourses = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await apiClient.get("/courses");
+            const response = await apiClient.get<Course[]>("/courses");
             setCourses(response.data);
-            setLoading(false);
         } catch (err: any) {
-            setLoading(false);
             setError(err.response?.data?.message || "Error al cargar los cursos");
+        } finally {
+            setLoading(false);
         }
-    };
+    }, []);
 
-    const createCourse = async (courseData: { title: string; description: string; isPublished: boolean; creatorId: number }) => {
+    const createCourse = async (courseData: Omit<Course, "id">) => {
         setLoading(true);
         try {
-            const response = await apiClient.post("/courses", courseData);
-            setLoading(false);
+            const response = await apiClient.post<Course>("/courses", courseData);
+            fetchCourses(); // Actualiza la lista tras crear
             return response.data;
         } catch (err: any) {
-            setLoading(false);
             setError(err.response?.data?.message || "Error al crear el curso");
             throw err;
+        } finally {
+            setLoading(false);
         }
     };
 
